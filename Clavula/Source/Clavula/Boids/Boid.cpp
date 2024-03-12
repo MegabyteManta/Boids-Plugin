@@ -2,7 +2,7 @@
 
 ABoid::ABoid()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ABoid::BeginPlay()
@@ -10,13 +10,6 @@ void ABoid::BeginPlay()
 	Super::BeginPlay();
 	Position = GetActorLocation();
 	Forward = GetActorForwardVector();
-}
-
-void ABoid::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	DTime = DeltaTime;
-	CheckRep();
 }
 
 void ABoid::Initialize(FBoidSettings BoidSettings, AActor* BoidTarget)
@@ -28,7 +21,7 @@ void ABoid::Initialize(FBoidSettings BoidSettings, AActor* BoidTarget)
 }
 
 // Calcs boid properties and checks for collision
-void ABoid::UpdateBoid()
+void ABoid::UpdateBoid(float DeltaTime)
 {
 	FVector Acceleration = FVector::ZeroVector;
 
@@ -70,7 +63,7 @@ void ABoid::UpdateBoid()
 
 	// Calc new position and rotation based on acceleration
 	
-	Velocity += Acceleration * DTime;
+	Velocity += Acceleration * DeltaTime;
 	float Speed = Velocity.Size();
 	FVector Dir = Velocity / Speed;
 	Speed = FMath::Clamp(Speed, Settings.MinSpeed, Settings.MaxSpeed);
@@ -78,11 +71,11 @@ void ABoid::UpdateBoid()
 	Velocity = Dir * Speed;
 
 	// Position and Forward are set so the BoidManager can use them to update the boids
-	Position = GetActorLocation()+Velocity*DTime;
+	Position = GetActorLocation()+Velocity*DeltaTime;
 	Forward = Dir;
 	SetActorLocation(Position);
 	// Rotation feels too twitchy without an interp
-	FRotator Rotation = FMath::RInterpTo(GetActorForwardVector().Rotation(),Dir.Rotation(), DTime, 10.f);
+	FRotator Rotation = FMath::RInterpTo(GetActorForwardVector().Rotation(),Dir.Rotation(), DeltaTime, 10.f);
 	SetActorRotation(Rotation);
 }
 
@@ -135,7 +128,6 @@ FVector ABoid::SteerTowards(FVector Vector) const
 
 bool ABoid::CheckRep() const
 {
-	ensureMsgf(DTime>=0, TEXT("DTime < 0"));
 	ensureMsgf(VisibleFlockmates>=0, TEXT("VisibleFlockmates < 0"));
-	return DTime>=0 && VisibleFlockmates>=0;
+	return VisibleFlockmates>=0;
 }

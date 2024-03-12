@@ -11,18 +11,18 @@ void ABoidManager::BeginPlay()
 {
 	Super::BeginPlay();
 	if (IsValid(BoidClass))
-		Boids = SpawnBoids(BoidClass, SpawnCount, GetActorLocation(), SpawnRadius);
+		SpawnBoids(Boids, BoidClass, SpawnCount, GetActorLocation(), SpawnRadius);
 }
 
 // Update all the boids
 void ABoidManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UpdateBoids();
+	UpdateBoids(DeltaTime);
 }
 
 // Updates all boid properties based on boids' current Position and Forward vector
-void ABoidManager::UpdateBoids()
+void ABoidManager::UpdateBoids(float DeltaTime)
 {
 	if (Boids.Num() != 0)
 	{
@@ -54,24 +54,22 @@ void ABoidManager::UpdateBoids()
 					}
 				}
 			}
-			Boids[i]->UpdateBoid();
+			Boids[i]->UpdateBoid(DeltaTime);
 		}
 	}
 }
 
 // Spawn boids randomly within a sphere
-TArray<ABoid*> ABoidManager::SpawnBoids(TSubclassOf<ABoid> Class, int Count, FVector Location, float Radius) const
+void ABoidManager::SpawnBoids(TArray<ABoid*>& OutBoids, TSubclassOf<ABoid> Class, int Count, FVector Location, float Radius) const
 {
-	TArray<ABoid*> SpawnedBoids;
 	for (int i = 0; i < SpawnCount; i++)
 	{
 		FActorSpawnParameters SpawnParams;
 		FVector Loc = GetRandomPointInSphere(Location, Radius);
 		ABoid* Boid = GetWorld()->SpawnActor<ABoid>(Class, Loc, GetActorRotation(), SpawnParams);
 		Boid->Initialize(Settings, Target);
-		SpawnedBoids.Add(Boid);
+		OutBoids.Add(Boid);
 	}
-	return SpawnedBoids;
 }
 
 // Gets a random point within a sphere

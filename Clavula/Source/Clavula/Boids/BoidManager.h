@@ -42,6 +42,7 @@ protected:
 
 private:
 	// The spawned boids
+	UPROPERTY()
 	TArray<ABoid*> Boids;
 
 public:
@@ -53,19 +54,20 @@ protected:
 	
 private:
 	/**
-	 * Updates all boids' data
+	 * Updates all boids' data.
+	 * @param DeltaTime : The delta time of the tick
 	 */
-	void UpdateBoids();
+	void UpdateBoids(float DeltaTime);
 
 	/**
 	 * Spawns boids randomly within a sphere at center Location with radius Radius
+	 * @param OutBoids : The array to put the spawned boids in.
 	 * @param BoidClass : The class of boid to be spawned. None results in no boids spawning
 	 * @param Count : The number of boids to be spawned.
 	 * @param Location : The location to spawn the boids
 	 * @param Radius : The radius around the location to spawn the boids
-	 * @return Array of spawned boids
 	 */
-	TArray<ABoid*> SpawnBoids(TSubclassOf<ABoid> BoidClass, int Count, FVector Location, float Radius) const;
+	void SpawnBoids(TArray<ABoid*>& OutBoids, TSubclassOf<ABoid> BoidClass, int Count, FVector Location, float Radius) const;
 	
 	/**
 	 * Gets a random point within a sphere at center Center with radius Radius.

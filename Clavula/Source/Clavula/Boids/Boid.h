@@ -35,16 +35,14 @@ public:
 	int VisibleFlockmates = 0;
 
 private:
-	// Delta time
-	float DTime = 0;
 	
 	FBoidSettings Settings;
 	FVector Velocity = FVector::ZeroVector;
+	UPROPERTY()
 	AActor* Target = nullptr;
 
 public:	
 	ABoid();
-	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -58,9 +56,11 @@ public:
 	void Initialize(FBoidSettings BoidSettings, AActor* BoidTarget);
 	
 	/**
-	 * Updates their properties, checks for collision, and sets position and rotation
+	 * Updates their properties, checks for collision, and sets position and rotation.
+	 * Called by the manager.
+	 * @param DeltaTime : The delta time given by the manager
 	 */
-	void UpdateBoid();
+	void UpdateBoid(float DeltaTime);
 	
 private:
 	/**
@@ -83,7 +83,6 @@ private:
 	FVector SteerTowards(FVector Vector) const;
 
 	// Rep Invariants:
-	//	DTime >= 0
 	//	VisibleFlockmates >= 0
 	bool CheckRep() const; 
 };
